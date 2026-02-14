@@ -34,13 +34,22 @@
                         '5xl': '40px',
                     },
                     colors: {
+                        // Точно такие же цвета как в geometry.html
                         light: {
                             bg: '#FDF7FF',
                             surface: '#FFF',
-                            surfaceContainer: '#F3EDF7',
-                            surfaceContainerHigh: '#ECE6F0',
+                            surfaceContainer: 'rgb(var(--color-surface-container) / <alpha-value>)',
+                            surfaceContainerHigh: 'rgb(var(--color-surface-container-high) / <alpha-value>)',
                             primary: 'rgb(var(--color-primary) / <alpha-value>)',
-                            onPrimary: '255 255 255',
+                            onPrimary: 'rgb(var(--color-on-primary) / <alpha-value>)',
+                            secondaryContainer: 'rgb(var(--color-secondary-container) / <alpha-value>)',
+                            onSecondaryContainer: 'rgb(var(--color-on-secondary-container) / <alpha-value>)',
+                            tertiaryContainer: 'rgb(var(--color-tertiary-container) / <alpha-value>)',
+                            onTertiaryContainer: 'rgb(var(--color-on-tertiary-container) / <alpha-value>)',
+                            correct: '#E8F5E9',
+                            onCorrect: '#1B5E20',
+                            error: '#FFEBEE',
+                            onError: '#B71C1C',
                         },
                         dark: {
                             bg: '#0F0D13',
@@ -49,6 +58,14 @@
                             surfaceContainerHigh: '#2B2930',
                             primary: 'rgb(var(--color-primary) / <alpha-value>)',
                             onPrimary: 'rgb(var(--color-on-primary) / <alpha-value>)',
+                            secondaryContainer: 'rgb(var(--color-secondary-container) / <alpha-value>)',
+                            onSecondaryContainer: 'rgb(var(--color-on-secondary-container) / <alpha-value>)',
+                            tertiaryContainer: 'rgb(var(--color-tertiary-container) / <alpha-value>)',
+                            onTertiaryContainer: 'rgb(var(--color-on-tertiary-container) / <alpha-value>)',
+                            correct: '#1E3226',
+                            onCorrect: '#A5D6A7',
+                            error: '#410E0B',
+                            onError: '#F2B8B5',
                         }
                     },
                     animation: {
@@ -87,21 +104,40 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
+        /* --- Theme Logic (Exact Copy from Geometry) --- */
         const hslToRgb = (h, s, l) => {
-            s /= 100; l /= 100;
+            s /= 100;
+            l /= 100;
             const k = n => (n + h / 30) % 12;
             const a = s * Math.min(l, 1 - l);
-            const f = n => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
-            return `${Math.round(255 * f(0))} ${Math.round(255 * f(8))} ${Math.round(255 * f(4))}`;
+            const f = n =>
+                l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+            const r = Math.round(255 * f(0));
+            const g = Math.round(255 * f(8));
+            const b = Math.round(255 * f(4));
+            return `${r} ${g} ${b}`;
         };
 
-        const updateThemeVariables = (primaryHue, isDark) => {
+        const updateThemeVariables = (primaryHue, tertiaryHue, isDark) => {
             const root = document.documentElement;
             if (!isDark) {
                 root.style.setProperty('--color-primary', hslToRgb(primaryHue, 60, 40)); 
+                root.style.setProperty('--color-on-primary', '255 255 255');
+                root.style.setProperty('--color-surface-container', hslToRgb(primaryHue, 20, 96));
+                root.style.setProperty('--color-surface-container-high', hslToRgb(primaryHue, 25, 92));
+                root.style.setProperty('--color-secondary-container', hslToRgb(primaryHue, 30, 90));
+                root.style.setProperty('--color-on-secondary-container', '#1D192B');
+                root.style.setProperty('--color-tertiary-container', hslToRgb(tertiaryHue, 40, 90));
+                root.style.setProperty('--color-on-tertiary-container', hslToRgb(tertiaryHue, 60, 20));
             } else {
                 root.style.setProperty('--color-primary', hslToRgb(primaryHue, 70, 80)); 
                 root.style.setProperty('--color-on-primary', hslToRgb(primaryHue, 70, 20));
+                root.style.setProperty('--color-surface-container', '#211F26'); 
+                root.style.setProperty('--color-surface-container-high', '#2B2930');
+                root.style.setProperty('--color-secondary-container', hslToRgb(primaryHue, 20, 30));
+                root.style.setProperty('--color-on-secondary-container', hslToRgb(primaryHue, 70, 90));
+                root.style.setProperty('--color-tertiary-container', hslToRgb(tertiaryHue, 40, 30));
+                root.style.setProperty('--color-on-tertiary-container', hslToRgb(tertiaryHue, 70, 90));
             }
         };
 
@@ -112,9 +148,12 @@
         const App = () => {
             useEffect(() => {
                 const savedTheme = localStorage.getItem('theme') || 'dark';
+                // EXACT same defaults as Geometry: 260 for Primary, 320 for Tertiary
                 const savedHue = parseInt(localStorage.getItem('accentHue')) || 260;
+                const savedTertiaryHue = parseInt(localStorage.getItem('tertiaryHue')) || 320;
+                
                 document.documentElement.classList.toggle('dark', savedTheme === 'dark');
-                updateThemeVariables(savedHue, savedTheme === 'dark');
+                updateThemeVariables(savedHue, savedTertiaryHue, savedTheme === 'dark');
             }, []);
 
             const handleGoBack = () => {
