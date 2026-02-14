@@ -34,9 +34,10 @@
                         '5xl': '40px',
                     },
                     colors: {
+                        // Точно такие же цвета как в geometry.html
                         light: {
-                            bg: '#F0F4F8',
-                            surface: '#FFFFFF',
+                            bg: '#FDF7FF',
+                            surface: '#FFF',
                             surfaceContainer: 'rgb(var(--color-surface-container) / <alpha-value>)',
                             surfaceContainerHigh: 'rgb(var(--color-surface-container-high) / <alpha-value>)',
                             primary: 'rgb(var(--color-primary) / <alpha-value>)',
@@ -51,10 +52,10 @@
                             onError: '#B71C1C',
                         },
                         dark: {
-                            bg: '#0B1015',
-                            surface: '#10151A',
-                            surfaceContainer: '#182026',
-                            surfaceContainerHigh: '#202830',
+                            bg: '#0F0D13',
+                            surface: '#141218',
+                            surfaceContainer: '#211F26',
+                            surfaceContainerHigh: '#2B2930',
                             primary: 'rgb(var(--color-primary) / <alpha-value>)',
                             onPrimary: 'rgb(var(--color-on-primary) / <alpha-value>)',
                             secondaryContainer: 'rgb(var(--color-secondary-container) / <alpha-value>)',
@@ -106,7 +107,7 @@
     <script type="text/babel">
         const { useState, useEffect } = React;
 
-        /* --- Theme Logic --- */
+        /* --- Theme Logic (Exact Copy from Geometry) --- */
         const hslToRgb = (h, s, l) => {
             s /= 100;
             l /= 100;
@@ -134,8 +135,8 @@
             } else {
                 root.style.setProperty('--color-primary', hslToRgb(primaryHue, 70, 80)); 
                 root.style.setProperty('--color-on-primary', hslToRgb(primaryHue, 70, 20));
-                root.style.setProperty('--color-surface-container', '#182026'); 
-                root.style.setProperty('--color-surface-container-high', '#202830');
+                root.style.setProperty('--color-surface-container', '#211F26'); 
+                root.style.setProperty('--color-surface-container-high', '#2B2930');
                 root.style.setProperty('--color-secondary-container', hslToRgb(primaryHue, 20, 30));
                 root.style.setProperty('--color-on-secondary-container', hslToRgb(primaryHue, 70, 90));
                 root.style.setProperty('--color-tertiary-container', hslToRgb(tertiaryHue, 40, 30));
@@ -310,11 +311,11 @@
         const App = () => {
             const [tab, setTab] = useState('theory');
 
-            // Init Theme
+            // Init Theme - EXACTLY matching Geometry's default keys
             useEffect(() => {
                 const savedTheme = localStorage.getItem('theme') || 'dark';
-                const savedHue = parseInt(localStorage.getItem('accentHue')) || 215; 
-                const savedTertiaryHue = parseInt(localStorage.getItem('tertiaryHue')) || 280;
+                const savedHue = parseInt(localStorage.getItem('accentHue')) || 260; // Default to Geometry Purple (260) if not set
+                const savedTertiaryHue = parseInt(localStorage.getItem('tertiaryHue')) || 320;
                 
                 document.documentElement.classList.toggle('dark', savedTheme === 'dark');
                 updateThemeVariables(savedHue, savedTertiaryHue, savedTheme === 'dark');
